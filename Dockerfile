@@ -7,7 +7,7 @@ COPY . .
 RUN npm ci --no-audit --ignore-scripts
 RUN npm run production
 
-FROM php:8.1-fpm-alpine
+FROM php:8.1-alpine
 
 ARG S6_OVERLAY_VERSION=3.1.1.2
 
@@ -50,10 +50,15 @@ RUN apk update && \
 
     # configure extensions
     docker-php-ext-configure gd --enable-gd --with-jpeg --with-webp && \
+    docker-php-ext-configure pcntl --enable-pcntl && \
 
     # install redis
     pecl install redis && \
     docker-php-ext-enable redis && \
+
+    # install swoole
+    pecl install swoole && \
+    docker-php-ext-enable swoole && \
 
     # install extensions
     docker-php-ext-install \
@@ -64,6 +69,7 @@ RUN apk update && \
     gd \
     intl \
     opcache \
+    pcntl \
     pdo_pgsql \
     simplexml \
     zip && \
